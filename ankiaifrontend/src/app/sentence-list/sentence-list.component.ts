@@ -9,12 +9,11 @@ import { SentenceService } from '../sentence.service';
   standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './sentence-list.component.html',
-  styleUrl: './sentence-list.component.css',
+  styleUrls: ['./sentence-list.component.css'],
 })
 export class SentenceListComponent implements OnInit {
   sentences: Sentence[] = [];
   newSentence: Sentence = { text: '' };
-  showAddForm: boolean = false;
 
   constructor(private sentenceService: SentenceService) {}
 
@@ -32,15 +31,14 @@ export class SentenceListComponent implements OnInit {
     });
   }
 
-  addSentence() {
+  addSentence(): void {
+    if (!this.newSentence.text.trim()) {
+      return; // Evita envio de sentenças vazias
+    }
+
     this.sentenceService.createSentence(this.newSentence).subscribe(() => {
       this.loadSentences();
       this.newSentence = { text: '' };
-      this.showAddForm = false;
     });
-  }
-
-  toggleAddForm(): void {
-    this.showAddForm = !this.showAddForm;
   }
 }
