@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -78,6 +79,16 @@ public class GenerationController {
 
         // Gera a frase em inglês que contenha a palavra
         String englishSentence = huggingFaceService.generateSentence(word);
+
+        // Se a frase gerada estiver vazia ou indicar erro, retorne a mensagem sem
+        // tentar traduzir
+        if (englishSentence == null || englishSentence.trim().isEmpty() ||
+                englishSentence.contains("Unable to generate sentence")) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Não foi possível gerar a frase no momento. Tente novamente mais tarde.");
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
+        }
+
         // Traduz a frase para o português
         String portugueseSentence = huggingFaceService.translateToPortuguese(englishSentence);
 

@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Sentence } from '../sentence';
@@ -15,7 +16,14 @@ export class SentenceListComponent implements OnInit {
   sentences: Sentence[] = [];
   newSentence: Sentence = { text: '' };
 
-  constructor(private sentenceService: SentenceService) {}
+  // Propriedades para o treino
+  result: any = null;
+  private apiUrl = 'http://localhost:8080/generate/random';
+
+  constructor(
+    private sentenceService: SentenceService,
+    private http: HttpClient
+  ) {}
 
   ngOnInit(): void {
     this.loadSentences();
@@ -33,12 +41,23 @@ export class SentenceListComponent implements OnInit {
 
   addSentence(): void {
     if (!this.newSentence.text.trim()) {
-      return; // Evita envio de sentenças vazias
+      return; // Evita o envio de sentenças vazias
     }
 
     this.sentenceService.createSentence(this.newSentence).subscribe(() => {
       this.loadSentences();
       this.newSentence = { text: '' };
+    });
+  }
+
+  train(): void {
+    this.http.get<any>(this.apiUrl).subscribe({
+      next: (data) => {
+        this.result = data;
+      },
+      error: (err) => {
+        console.error('Erro ao treinar:', err);
+      },
     });
   }
 }

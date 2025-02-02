@@ -34,14 +34,22 @@ public class HuggingFaceService {
      * @return Frase gerada ou mensagem de erro.
      */
     public String generateSentence(String word) {
+        // Ajuste o prompt para instruir de forma mais clara e criativa
+        String prompt = "Write a creative and natural English sentence that uses the word \"" + word + "\".";
         String modelUrl = "https://api-inference.huggingface.co/models/distilgpt2";
-        String prompt = "Generate an English sentence that contains the word \"" + word + "\".";
+
         Map<String, Object> payload = new HashMap<>();
         payload.put("inputs", prompt);
 
-        // Parâmetro opcional para definir o tamanho máximo da geração
+        // Parâmetros de geração ajustados para incentivar variação e criatividade
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("max_length", 50);
+        parameters.put("max_length", 100); // Aumenta o tamanho máximo para gerar mais conteúdo
+        parameters.put("do_sample", true); // Ativa a amostragem aleatória
+        parameters.put("temperature", 0.8); // Define a temperatura para controlar a aleatoriedade
+        parameters.put("top_k", 50); // Limita os tokens mais prováveis a serem considerados
+        parameters.put("top_p", 0.95); // Usa nucleus sampling
+        // Se suportado pelo modelo, podemos tentar retornar apenas o novo texto
+        parameters.put("return_full_text", false);
         payload.put("parameters", parameters);
 
         HttpHeaders headers = new HttpHeaders();
@@ -54,23 +62,46 @@ public class HuggingFaceService {
         while (attempt < maxRetries) {
             try {
                 ResponseEntity<String> response = restTemplate.postForEntity(modelUrl, request, String.class);
+                System.out.println("Resposta da API: " + response.getBody());
+
                 if (response.getStatusCode() == HttpStatus.OK) {
                     JsonNode root = objectMapper.readTree(response.getBody());
+
                     if (root.isArray() && root.size() > 0) {
-                        String generatedText = root.get(0).get("generated_text").asText();
-                        // Remove o prompt caso esteja presente no início do texto gerado
-                        if (generatedText.startsWith(prompt)) {
-                            generatedText = generatedText.substring(prompt.length()).trim();
+                        JsonNode firstElement = root.get(0);
+
+                        if (firstElement.has("generated_text")) {
+                            String generatedText = firstElement.get("generated_text").asText();
+
+                            // Se o prompt for repetido no início da resposta, removê-lo
+                            if (generatedText.startsWith(prompt)) {
+                                generatedText = generatedText.substring(prompt.length()).trim();
+                            }
+
+                            if (generatedText == null || generatedText.trim().isEmpty()) {
+                                System.out.println("generated_text está vazio.");
+                            } else {
+                                return generatedText;
+                            }
+                        } else {
+                            System.out.println(
+                                    "Campo 'generated_text' não encontrado na resposta: " + firstElement.toString());
                         }
-                        return generatedText;
+                    } else {
+                        System.out.println("Resposta da API não é um array ou está vazia: " + root.toString());
                     }
+                } else {
+                    System.out.println("Status de resposta não OK: " + response.getStatusCode());
                 }
+                // Caso não obtenha um resultado válido, interrompe as tentativas
                 break;
             } catch (HttpServerErrorException e) {
-                if (e.getMessage().contains("Model too busy")) {
+                // Se o modelo estiver ocupado ou carregando, tenta novamente
+                if (e.getMessage().contains("Model too busy") || e.getMessage().contains("currently loading")) {
                     attempt++;
+                    System.out.println("Tentativa " + attempt + " falhou. Modelo ocupado, aguardando 3 segundos...");
                     try {
-                        Thread.sleep(3000); // aguarda 3 segundos antes de tentar novamente
+                        Thread.sleep(3000);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
                         return "Generation interrupted.";
