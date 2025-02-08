@@ -18,7 +18,7 @@ export class SentenceListComponent implements OnInit {
 
   // Propriedades para o treino
   result: any = null;
-  private apiUrl = 'http://localhost:8080/generate/random';
+  private apiUrl = 'http://localhost:8081/generate/random';
 
   constructor(
     private sentenceService: SentenceService,

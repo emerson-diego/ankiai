@@ -14,6 +14,7 @@ public class Sentence {
     private String text;
     private String tipo;
     private Integer treino;
+    private Integer rowNumber;
 
     public Sentence() {
     }
