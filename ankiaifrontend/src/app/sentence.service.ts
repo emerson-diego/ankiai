@@ -7,7 +7,7 @@ import { Sentence } from './sentence';
   providedIn: 'root',
 })
 export class SentenceService {
-  private apiUrl = 'http://localhost:8080/sentences'; // URL da sua API
+  private apiUrl = 'http://localhost:8081/sentences'; // URL da sua API
 
   constructor(private http: HttpClient) {}
 

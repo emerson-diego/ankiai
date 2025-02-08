@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.ankiaibackend.datasource.SentenceDataSource;
 import com.example.ankiaibackend.model.Sentence;
-import com.example.ankiaibackend.repository.SentenceRepository;
 import com.example.ankiaibackend.service.SentenceClassificationService;
 
 @RestController
@@ -19,7 +19,7 @@ import com.example.ankiaibackend.service.SentenceClassificationService;
 public class SentenceController {
 
     @Autowired
-    private SentenceRepository sentenceRepository;
+    private SentenceDataSource sentenceDataSource;
 
     @Autowired
     private SentenceClassificationService classificationService;
@@ -27,20 +27,17 @@ public class SentenceController {
     // Endpoint para inserir uma nova sentença
     @PostMapping
     public ResponseEntity<Sentence> createSentence(@RequestBody Sentence sentence) {
-        // Verifica o tipo da sentença utilizando o modelo do Hugging Face
         String tipoClassificacao = classificationService.classificar(sentence.getText());
         sentence.setTipo(tipoClassificacao);
         sentence.setTreino(0);
-
-        // Salva a sentença com o tipo identificado
-        Sentence newSentence = sentenceRepository.save(sentence);
+        Sentence newSentence = sentenceDataSource.save(sentence);
         return ResponseEntity.ok(newSentence);
     }
 
     // Endpoint para recuperar todas as sentenças
     @GetMapping
     public ResponseEntity<List<Sentence>> getAllSentences() {
-        List<Sentence> sentences = sentenceRepository.findAll();
+        List<Sentence> sentences = sentenceDataSource.findAll();
         return ResponseEntity.ok(sentences);
     }
 }
