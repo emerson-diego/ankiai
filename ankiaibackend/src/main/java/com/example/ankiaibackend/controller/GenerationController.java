@@ -54,11 +54,11 @@ public class GenerationController {
         // Incrementa o treino e salva na fonte de dados
         Integer treino = sentence.getTreino() != null ? sentence.getTreino() : 0;
         sentence.setTreino(treino + 1);
-        sentenceDataSource.save(sentence);
+        //sentenceDataSource.save(sentence);
 
         // Atualiza a planilha do Google se necessário
         try {
-            googleSheetService.atualizarTreino(sentence);
+            //googleSheetService.atualizarTreino(sentence);
         } catch (Exception e) {
             // Caso ocorra erro na integração com a planilha, loga a exceção e segue o fluxo
             // normalmente
@@ -68,7 +68,7 @@ public class GenerationController {
         Map<String, Object> response = new HashMap<>();
         response.put("englishSentence", englishSentence);
         response.put("portugueseSentence", portugueseSentence);
-        response.put("treino", sentence.getTreino());
+        //response.put("treino", sentence.getTreino());
 
         return ResponseEntity.ok(response);
     }
@@ -101,21 +101,22 @@ public class GenerationController {
         String portugueseSentence = huggingFaceService.translateToPortuguese(englishSentence);
 
         // Incrementa o treino e salva na fonte de dados
-        Integer treino = sentence.getTreino() != null ? sentence.getTreino() : 0;
-        sentence.setTreino(treino + 1);
-        sentenceDataSource.save(sentence);
+       // Integer treino = sentence.getTreino() != null ? sentence.getTreino() : 0;
+       // sentence.setTreino(treino + 1);
+       // sentenceDataSource.save(sentence);
 
         // Atualiza a planilha do Google se necessário
         try {
-            googleSheetService.atualizarTreino(sentence);
+           // googleSheetService.atualizarTreino(sentence);
         } catch (Exception e) {
             System.err.println("Erro ao atualizar a planilha: " + e.getMessage());
         }
 
         Map<String, Object> response = new HashMap<>();
+        response.put("sentenca", palavra);
         response.put("englishSentence", englishSentence);
         response.put("portugueseSentence", portugueseSentence);
-        response.put("treino", sentence.getTreino());
+      //  response.put("treino", sentence.getTreino());
 
         return ResponseEntity.ok(response);
     }
