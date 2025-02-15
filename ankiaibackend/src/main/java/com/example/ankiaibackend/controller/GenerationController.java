@@ -103,7 +103,7 @@ public class GenerationController {
         // Incrementa o treino e salva na fonte de dados
         Integer treino = sentence.getTreino() != null ? sentence.getTreino() : 0;
         sentence.setTreino(treino + 1);
-        sentenceDataSource.save(sentence);
+        //sentenceDataSource.save(sentence);
 
         // Atualiza a planilha do Google se necessário
         try {

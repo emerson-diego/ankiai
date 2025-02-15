@@ -1,79 +1,68 @@
 <div class="container mx-auto p-6 bg-gray-50 min-h-screen">
-  <!-- Cabeçalho -->
+  <!-- Header -->
   <header class="mb-8 text-center">
-    <h1 class="text-4xl font-extrabold text-gray-800">
-      Gerenciador de Palavras
-    </h1>
-    <p class="mt-2 text-gray-600">
-      Adicione novas palavras, treine e acompanhe suas palavras favoritas.
-    </p>
+    <h1 class="text-4xl font-extrabold text-gray-800">AnkiAI</h1>
+    <p class="mt-2 text-gray-600">Add new words, practice, and track the words you are trying to learn.</p>
   </header>
 
-  <!-- Formulário de Adição de Palavra -->
+  <!-- Add Word Form -->
   <section class="mb-10">
     <div class="bg-white rounded-lg shadow p-6">
-      <h3 class="text-2xl font-semibold text-gray-700 mb-4">
-        Adicionar Palavra
-      </h3>
+      <h3 class="text-2xl font-semibold text-gray-700 mb-4">Add Word</h3>
       <div class="flex flex-col sm:flex-row sm:items-center gap-4">
         <input
           type="text"
           [(ngModel)]="newSentence.text"
-          placeholder="Digite a palavra..."
+          placeholder="Enter the word..."
           class="w-full sm:flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
         />
         <button
           (click)="addSentence()"
           class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-lg transition"
         >
-          Salvar
+          Save
         </button>
       </div>
     </div>
   </section>
 
-  <!-- Seção de Treino Integrada -->
+  <!-- Training Section -->
   <section class="mb-10">
     <div class="bg-white rounded-lg shadow p-6">
-      <h2 class="text-2xl font-semibold text-gray-700 mb-4">Treinar Palavra</h2>
-      <p class="mb-4 text-gray-600">
-        Clique no botão abaixo para sortear uma palavra, gerar uma frase com ela
-        e ver a tradução.
-      </p>
+      <h2 class="text-2xl font-semibold text-gray-700 mb-4">Train Word</h2>
+      <p class="mb-4 text-gray-600">Click the button below to pick a random word, generate a sentence with it, and see its translation.</p>
       <button
         (click)="train()"
         class="bg-blue-500 hover:bg-blue-600 text-white font-bold px-6 py-3 rounded-lg transition"
       >
-        Treinar
+        Train
       </button>
 
       <div *ngIf="result" class="mt-6 p-6 border-t border-gray-200">
-        <h3 class="text-xl font-semibold text-gray-700 mb-3">
-          Resultado do Treino
-        </h3>
+        <h3 class="text-xl font-semibold text-gray-700 mb-3">Training Result</h3>
         <p class="mb-2">
-          <strong>Sentença: </strong>
+          <strong>Sentence: </strong>
           <span class="text-gray-800">{{ result.sentenca }}</span>
         </p>
         <p class="mb-2">
-          <strong>Frase em Inglês: </strong>
+          <strong>English Sentence: </strong>
           <span class="text-gray-800">{{ result.englishSentence }}</span>
         </p>
         <p class="mb-2">
-          <strong>Tradução em Português: </strong>
+          <strong>Portuguese Translation: </strong>
           <span class="text-gray-800">{{ result.portugueseSentence }}</span>
         </p>
         <p>
-          <strong>Nova Pontuação: </strong>
+          <strong>New Score: </strong>
           <span class="text-gray-800">{{ result.treino }}</span>
         </p>
       </div>
     </div>
   </section>
 
-  <!-- Lista de Palavras -->
+  <!-- Word List -->
   <section>
-    <h2 class="text-3xl font-bold text-gray-800 mb-6">Minhas Palavras</h2>
+    <h2 class="text-3xl font-bold text-gray-800 mb-6">My Words</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       <div
         *ngFor="let sentence of sentences"
