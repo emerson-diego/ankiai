@@ -73,10 +73,10 @@ public class GoogleSheetsSentenceRepository implements SentenceDataSource {
             if (values == null || values.isEmpty()) {
                 return sentences;
             }
-            int rowNumber = 0;
+            int rowNumber = 1; // Inicia a contagem em 1 para considerar a linha real na planilha
             for (List<Object> row : values) {
                 // Se a primeira linha for cabeçalho, pular
-                if (rowNumber == 0 && row.size() > 0 && row.get(0).toString().equalsIgnoreCase("Sentença")) {
+                if (rowNumber == 1 && row.size() > 0 && row.get(0).toString().equalsIgnoreCase("Sentença")) {
                     rowNumber++;
                     continue;
                 }
@@ -87,6 +87,8 @@ public class GoogleSheetsSentenceRepository implements SentenceDataSource {
                 sentence.setTipo(row.size() > 1 ? row.get(1).toString() : "");
                 // Utiliza a coluna 'Pontuação' como treino
                 sentence.setTreino(row.size() > 2 ? Integer.parseInt(row.get(2).toString()) : 0);
+                // **Modificação adicionada:** Define o rowNumber real da planilha
+                sentence.setRowNumber(rowNumber);
                 sentences.add(sentence);
                 rowNumber++;
             }
