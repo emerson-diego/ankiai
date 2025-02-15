@@ -62,7 +62,6 @@ public class GoogleSheetsSentenceRepository implements SentenceDataSource {
         return sentence;
     }
 
-    @Override
     public List<Sentence> findAll() {
         List<Sentence> sentences = new ArrayList<>();
         try {
@@ -87,9 +86,13 @@ public class GoogleSheetsSentenceRepository implements SentenceDataSource {
                 sentence.setTipo(row.size() > 1 ? row.get(1).toString() : "");
                 // Utiliza a coluna 'Pontuação' como treino
                 sentence.setTreino(row.size() > 2 ? Integer.parseInt(row.get(2).toString()) : 0);
-                // **Modificação adicionada:** Define o rowNumber real da planilha
+                // Define o rowNumber real da planilha
                 sentence.setRowNumber(rowNumber);
-                sentences.add(sentence);
+                
+                // Adiciona somente se a pontuação for menor que 4
+                if (sentence.getTreino() < 4) {
+                    sentences.add(sentence);
+                }
                 rowNumber++;
             }
         } catch (Exception e) {
