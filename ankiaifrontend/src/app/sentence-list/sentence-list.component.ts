@@ -19,6 +19,7 @@ export class SentenceListComponent implements OnInit {
   // Propriedades para o treino
   result: any = null;
   private apiUrl = 'http://localhost:8081/generate/random';
+  loading: boolean = false;
 
   constructor(
     private sentenceService: SentenceService,
@@ -51,12 +52,15 @@ export class SentenceListComponent implements OnInit {
   }
 
   train(): void {
+    this.loading = true; // Inicia o estado de carregamento
     this.http.get<any>(this.apiUrl).subscribe({
       next: (data) => {
         this.result = data;
+        this.loading = false; // Remove o estado de carregamento após a resposta
       },
       error: (err) => {
         console.error('Erro ao treinar:', err);
+        this.loading = false; // Remove o estado de carregamento mesmo em erro
       },
     });
   }
