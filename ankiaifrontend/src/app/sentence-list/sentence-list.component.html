@@ -43,10 +43,21 @@
         <p class="mb-2">
           <strong>Sentence: </strong>
           <span class="text-gray-800">{{ result.sentenca }}</span>
+         
         </p>
         <p class="mb-2">
           <strong>English Sentence: </strong>
           <span class="text-gray-800">{{ result.englishSentence }}</span>
+          <button
+          (click)="playAudio(result.sentenca)"
+          class="ml-4 p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition"
+          title="Ouvir áudio"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5L6 9H2v6h4l5 4V5z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" />
+          </svg>
+        </button>
         </p>
         <p class="mb-2">
           <strong>Portuguese Translation: </strong>

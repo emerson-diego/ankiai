@@ -7,17 +7,21 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ankiaibackend.datasource.GoogleSheetsService;
 import com.example.ankiaibackend.datasource.SentenceDataSource;
+import com.example.ankiaibackend.model.AudioRequest;
 import com.example.ankiaibackend.model.Sentence;
 import com.example.ankiaibackend.service.HuggingFaceService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/generate")
@@ -107,7 +111,7 @@ public class GenerationController {
 
         // Atualiza a planilha do Google se necessário
         try {
-            googleSheetService.atualizarTreino(sentence);
+           // googleSheetService.atualizarTreino(sentence);
         } catch (Exception e) {
             System.err.println("Erro ao atualizar a planilha: " + e.getMessage());
         }
@@ -119,5 +123,26 @@ public class GenerationController {
         response.put("treino", sentence.getTreino());
 
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Endpoint para converter uma sentença em áudio.
+     *
+     * @param audioRequest JSON com a sentença a ser convertida.
+     * @return Resposta com o áudio gerado.
+     */
+    @PostMapping("/audio")
+    public ResponseEntity<?> generateAudio(@RequestBody AudioRequest audioRequest) {
+        try {
+            byte[] audioBytes = huggingFaceService.generateAudio(audioRequest.getSentence());
+            HttpHeaders headers = new HttpHeaders();
+            // Defina o content type conforme o formato retornado pela API (ex: audio/wav ou audio/mpeg)
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            return new ResponseEntity<>(audioBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Erro ao gerar áudio.");
+        }
     }
 }

@@ -34,7 +34,7 @@ public class HuggingFaceService {
         // Atualiza o prompt para que o modelo retorne a frase delimitada por <sentence> e </sentence>
         String prompt = "Please provide exactly one example sentence in English that uses the following word: \""
                         + selectedText
-                        + "\". Output only the sentence in the following format: <sentence>Your generated sentence here</sentence>";
+                        + "\". Output only the sentence in the following format: <sentence> Your generated sentence here </sentence>";
         String modelUrl = "https://api-inference.huggingface.co/models/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B";
     
         // Criação do payload para a requisição
@@ -43,9 +43,9 @@ public class HuggingFaceService {
     
         // Configuração dos parâmetros de geração
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("max_new_tokens", 500);
+        parameters.put("max_new_tokens", 1000);
         parameters.put("do_sample", true);
-        parameters.put("temperature", 0.8);
+        parameters.put("temperature", 0.2);
         parameters.put("top_k", 50);
         parameters.put("top_p", 0.95);
         parameters.put("return_full_text", true);
@@ -148,7 +148,7 @@ public class HuggingFaceService {
     public String translateToPortuguese(String englishSentence) {
         // Prompt atualizado para forçar o formato exato e evitar explicações adicionais.
         String prompt = "Traduza a seguinte sentença do inglês para o português. Sua resposta DEVE CONTER APENAS a tradução e nada mais. " +
-                        "A resposta DEVE COMEÇAR com o delimitador <translation> e TERMINAR com o delimitador </translation>, sem nenhum texto antes ou depois. NÃO inclua explicações, chain-of-thought ou qualquer comentário adicional no seu resultado. " +
+                        "A resposta DEVE COMEÇAR com o delimitador <translation> e TERMINAR com o delimitador </translation>. " +
                         "Sentença: \"" + englishSentence + "\".";
     
         String modelUrl = "https://api-inference.huggingface.co/models/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B";
@@ -159,7 +159,7 @@ public class HuggingFaceService {
     
         // Configura os parâmetros de geração: temperatura baixa para respostas mais diretas
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("max_new_tokens", 100);
+        parameters.put("max_new_tokens", 1000);
         parameters.put("do_sample", true);
         parameters.put("temperature", 0.2); // Valor menor para reduzir a geração de chain-of-thought
         parameters.put("top_k", 50);
@@ -249,4 +249,51 @@ public class HuggingFaceService {
         }
         return "Unable to translate sentence at this moment.";
     }
+
+
+    /**
+     * Gera áudio a partir do texto informado.
+     *
+     * @param sentence Texto que será convertido em áudio.
+     * @return Vetor de bytes contendo o áudio gerado.
+     */
+    public byte[] generateAudio(String sentence) {
+        String modelUrl = "https://api-inference.huggingface.co/models/" + "facebook/mms-tts";
+        
+        // Criação do payload com o texto
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("inputs", sentence);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(HF_API_TOKEN);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
+
+        int maxRetries = 3;
+        int attempt = 0;
+
+        while (attempt < maxRetries) {
+            try {
+                ResponseEntity<byte[]> response = restTemplate.postForEntity(modelUrl, request, byte[].class);
+                if (response.getStatusCode() == HttpStatus.OK) {
+                    return response.getBody();
+                } else {
+                    attempt++;
+                    // Aguarda 3 segundos antes de tentar novamente
+                    Thread.sleep(3000);
+                }
+            } catch (Exception e) {
+                attempt++;
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        }
+        throw new RuntimeException("Não foi possível gerar áudio no momento.");
+    }
+
 }

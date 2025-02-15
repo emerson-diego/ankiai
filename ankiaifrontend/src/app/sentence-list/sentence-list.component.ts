@@ -60,4 +60,17 @@ export class SentenceListComponent implements OnInit {
       },
     });
   }
+
+  playAudio(sentenca: string): void {
+    this.sentenceService.getAudio(sentenca).subscribe({
+      next: (audioBlob: Blob) => {
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        audio.play();
+      },
+      error: (error) => {
+        console.error('Erro ao reproduzir o áudio:', error);
+      },
+    });
+  }
 }
